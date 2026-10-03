@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'dart:math';
 
-import 'package:offline_sync_queue/io.dart';
-import 'package:offline_sync_queue/offline_sync_queue.dart';
+import 'package:durable_sync_queue/io.dart';
+import 'package:durable_sync_queue/durable_sync_queue.dart';
 import 'package:test/test.dart';
 
 QueuedOperation _op(String id, int sequence) => QueuedOperation(

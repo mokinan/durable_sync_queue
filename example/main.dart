@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:offline_sync_queue/offline_sync_queue.dart';
+import 'package:durable_sync_queue/durable_sync_queue.dart';
 
 /// Simulates an app that writes while the network is unreliable.
 Future<void> main() async {

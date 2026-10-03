@@ -1,6 +1,6 @@
-# offline_sync_queue
+# durable_sync_queue
 
-[![CI](https://github.com/mokinan/offline_sync_queue/actions/workflows/ci.yml/badge.svg)](https://github.com/mokinan/offline_sync_queue/actions/workflows/ci.yml)
+[![CI](https://github.com/mokinan/durable_sync_queue/actions/workflows/ci.yml/badge.svg)](https://github.com/mokinan/durable_sync_queue/actions/workflows/ci.yml)
 
 A persistent, ordered, retrying operation queue for offline-first Dart and
 Flutter apps.
@@ -45,7 +45,7 @@ package handles the parts that cause real production bugs:
 ## Install
 
 ```bash
-dart pub add offline_sync_queue
+dart pub add durable_sync_queue
 ```
 
 ## Concepts
@@ -100,7 +100,7 @@ class DriftQueueStore implements QueueStore {
 Included:
 
 - `InMemoryQueueStore`, for tests and prototypes.
-- `JsonFileQueueStore` (`import 'package:offline_sync_queue/io.dart'`), which
+- `JsonFileQueueStore` (`import 'package:durable_sync_queue/io.dart'`), which
   writes atomically (temp file plus rename). It suits small queues on
   `dart:io` platforms. It is kept out of the main library so the core stays
   web-compatible.

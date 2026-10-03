@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:offline_sync_queue/offline_sync_queue.dart';
+import 'package:durable_sync_queue/durable_sync_queue.dart';
 import 'package:test/test.dart';
 
 /// A server that remembers idempotency keys and can be told to misbehave.

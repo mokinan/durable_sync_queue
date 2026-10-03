@@ -1,4 +1,4 @@
-## 1.0.0
+## 0.1.0
 
 - `SyncQueue` with per-group ordering, idempotency keys, exponential backoff
   with jitter, dead-lettering and `maxAttempts`.
