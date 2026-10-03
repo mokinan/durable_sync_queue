@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        sdk: ['3.5.0', stable]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: ${{ matrix.sdk }}
+      - run: dart pub get
+      - run: dart format --output=none --set-exit-if-changed .
+        if: matrix.sdk == 'stable'
+      - run: dart analyze --fatal-infos
+      - run: dart test --coverage=coverage
+      - name: Enforce 95% line coverage
+        if: matrix.sdk == 'stable'
+        run: |
+          dart pub global activate coverage
+          dart pub global run coverage:format_coverage \
+            --lcov --in=coverage --out=coverage/lcov.info --report-on=lib
+          total=$(awk -F: '/^LF:/{t+=$2} /^LH:/{h+=$2} END{printf "%.1f", h*100/t}' coverage/lcov.info)
+          echo "Line coverage: $total%"
+          awk -v c="$total" 'BEGIN{exit (c < 95)}'
+
+  publish-dry-run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+      - run: dart pub get
+      - run: dart pub publish --dry-run
