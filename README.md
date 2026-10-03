@@ -97,6 +97,11 @@ class DriftQueueStore implements QueueStore {
 }
 ```
 
+Calling `enqueue` **inside** a database transaction is supported. Automatic
+drains run in the zone where the queue was created, so they never inherit
+the transaction's zone. This matters for Drift, whose transactions are bound
+to a zone.
+
 Included:
 
 - `InMemoryQueueStore`, for tests and prototypes.

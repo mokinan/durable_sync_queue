@@ -152,6 +152,30 @@ void main() {
         reason: 'force must ignore the 5 minute backoff');
   });
 
+  test('automatic drains do not inherit the zone enqueue was called from',
+      () async {
+    // E.g. a database transaction: drift binds transactions to a zone.
+    final zonesSeen = <Object?>[];
+    queue = SyncQueue(
+      store: store,
+      clock: clock.call,
+      handler: (op) async {
+        zonesSeen.add(Zone.current[#transaction]);
+        return const Outcome.delivered();
+      },
+    )..start();
+    final delivered = queue.events.firstWhere((e) => e is OperationDelivered);
+
+    await runZoned(
+      () => queue.enqueue('create', {'name': 'a'}),
+      zoneValues: {#transaction: 'tx-1'},
+    );
+    await delivered.timeout(const Duration(seconds: 1));
+
+    expect(zonesSeen, [null]);
+    await queue.dispose();
+  });
+
   test('honours a server-provided retry delay', () async {
     await queue.enqueue('create', {'name': 'a'});
     server.failNext['a'] =

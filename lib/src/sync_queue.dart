@@ -90,6 +90,11 @@ class SyncQueue {
   String? _inFlightId;
   int _sequence = 0;
   Timer? _timer;
+
+  /// Automatic drains run here, not in the caller's zone. Callers often
+  /// enqueue inside a database transaction (a zone); a drain inheriting it
+  /// would keep using the transaction after it has committed.
+  final Zone _zone = Zone.current;
   bool _autoRetry = false;
 
   /// Everything that happens to operations.
@@ -138,7 +143,7 @@ class SyncQueue {
     );
     await _put(operation);
     _events.add(OperationEnqueued(operation));
-    if (_autoRetry) unawaited(drain());
+    if (_autoRetry) _drainInOwnZone();
     return operation;
   }
 
@@ -168,7 +173,7 @@ class SyncQueue {
     }
     await _put(operation.copyWith(
         status: OperationStatus.pending, nextAttemptAt: _clock(), attempts: 0));
-    if (_autoRetry) unawaited(drain());
+    if (_autoRetry) _drainInOwnZone();
     return true;
   }
 
@@ -276,6 +281,8 @@ class SyncQueue {
     );
   }
 
+  void _drainInOwnZone() => _zone.run(() => unawaited(drain()));
+
   /// The oldest pending operation that is due and heads its group.
   QueuedOperation? _nextDue(Set<String> blocked, {required bool force}) {
     final now = _clock();
@@ -313,8 +320,8 @@ class SyncQueue {
     _timer?.cancel();
     if (!_autoRetry || at == null) return;
     final delay = at.difference(_clock());
-    _timer = Timer(
-        delay.isNegative ? Duration.zero : delay, () => unawaited(drain()));
+    _timer = _zone.createTimer(
+        delay.isNegative ? Duration.zero : delay, _drainInOwnZone);
   }
 
   List<QueuedOperation> _sorted(OperationStatus status) =>

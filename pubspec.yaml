@@ -3,7 +3,7 @@ description: >-
   A persistent, ordered, retrying operation queue for offline-first apps.
   Idempotency keys, per-group ordering, exponential backoff and dead-lettering,
   with pluggable storage. Pure Dart.
-version: 0.1.1
+version: 0.1.2
 repository: https://github.com/mokinan/durable_sync_queue
 issue_tracker: https://github.com/mokinan/durable_sync_queue/issues
 topics:

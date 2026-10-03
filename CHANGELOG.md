@@ -1,3 +1,10 @@
+## 0.1.2
+
+- Fix: automatic drains (after `enqueue`/`retry` and on retry timers) now run
+  in the zone the queue was created in. Previously, enqueueing inside a
+  database transaction (e.g. Drift's zone-bound transactions) made the drain
+  reuse the committed transaction and hang.
+
 ## 0.1.1
 
 - Fix: `drain(force: true)` could be absorbed by a regular pass that started
