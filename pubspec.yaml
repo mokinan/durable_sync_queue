@@ -1,0 +1,24 @@
+name: offline_sync_queue
+description: >-
+  A persistent, ordered, retrying operation queue for offline-first apps.
+  Idempotency keys, per-group ordering, exponential backoff and dead-lettering,
+  with pluggable storage. Pure Dart.
+version: 1.0.0
+repository: https://github.com/mokinan/offline_sync_queue
+issue_tracker: https://github.com/mokinan/offline_sync_queue/issues
+topics:
+  - offline
+  - sync
+  - queue
+  - retry
+  - idempotency
+
+environment:
+  sdk: ^3.5.0
+
+dependencies:
+  meta: ^1.15.0
+
+dev_dependencies:
+  lints: ^5.0.0
+  test: ^1.25.0
