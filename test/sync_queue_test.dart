@@ -121,6 +121,37 @@ void main() {
     expect(server.applied, ['create:a1', 'update:a2']);
   });
 
+  test('a forced drain is not swallowed by a regular pass started meanwhile',
+      () async {
+    final gate = Completer<Outcome>();
+    var calls = 0;
+    queue = SyncQueue(
+      store: store,
+      clock: clock.call,
+      backoff: const ConstantBackoff(Duration(minutes: 5)),
+      handler: (op) {
+        calls++;
+        return calls == 1
+            ? gate.future
+            : Future.value(const Outcome.delivered());
+      },
+    );
+    await queue.enqueue('create', {'name': 'a'});
+    final first = queue.drain(); // in flight, will fail
+    await Future<void>.delayed(Duration.zero);
+
+    final forced = queue.drain(force: true);
+    gate.complete(const Outcome.retryLater('offline'));
+    await first;
+    // A regular pass starts before the forced one gets its turn.
+    final regular = queue.drain();
+
+    await regular;
+    final report = await forced;
+    expect(report.delivered, 1,
+        reason: 'force must ignore the 5 minute backoff');
+  });
+
   test('honours a server-provided retry delay', () async {
     await queue.enqueue('create', {'name': 'a'});
     server.failNext['a'] =

@@ -1,3 +1,8 @@
+## 0.1.1
+
+- Fix: `drain(force: true)` could be absorbed by a regular pass that started
+  while it was waiting, leaving operations in backoff after reconnecting.
+
 ## 0.1.0
 
 - `SyncQueue` with per-group ordering, idempotency keys, exponential backoff

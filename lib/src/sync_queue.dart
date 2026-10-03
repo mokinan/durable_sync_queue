@@ -182,10 +182,13 @@ class SyncQueue {
       return _draining ??=
           _drain(force: false).whenComplete(() => _draining = null);
     }
-    // A forced pass must not be swallowed by a regular one already running.
-    await _draining;
-    return _draining ??=
-        _drain(force: true).whenComplete(() => _draining = null);
+    // A forced pass must not be swallowed by a regular one: wait until no
+    // pass is running (another may start while we wait), then claim the
+    // slot synchronously.
+    while (_draining != null) {
+      await _draining;
+    }
+    return _draining = _drain(force: true).whenComplete(() => _draining = null);
   }
 
   /// Drains now, after every enqueue, and again whenever a retry falls due.
